@@ -13,5 +13,5 @@ You can see open this file with Visual Studio Community
 ## Simple Projects
 ![Alt text](/resources/SimpleProjects.PNG?raw=true "Simple Projects")
 
-## Simple Projects
+## Complex Projects
 ![Alt text](/resources/ComplexProjects.PNG?raw=true "Complex Projects")
