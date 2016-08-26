@@ -120,11 +120,29 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
                     foreach (var projectReference in projectReferences)
                     {
                         string projectReferenceName = projectReference.Element(ns + "Name").Value;
-                        var prj = solution.Projects.SingleOrDefault(p => p.Name == projectReferenceName);
-                        if (prj != null)
-                            project.Projects.Add(prj);
+                
+                        IEnumerable<Project> referencesProjects = solution.Projects.Where(p => p.Name == projectReferenceName);
+
+                        if (referencesProjects.Count() > 1)
+                        {
+                            Console.WriteLine(String.Format("[ERROR] Project Reference: {0}. Maybe you may have projects (.csproj) in folder {1}  that are not in solution file {2}", projectReferenceName, solution.Path, solution.PathAndName));
+                            foreach (Project p in referencesProjects)
+                            {
+                                Console.WriteLine(String.Format(p.PathAndName));
+                            }
+                        }
                         else
-                            Console.WriteLine(String.Format("Project Reference: {0}, project not found in: {1}", projectReferenceName, project.Path));
+                        { 
+                                if (referencesProjects.Any())
+                                {
+                                    Project prj = referencesProjects.First();
+                                    project.Projects.Add(prj);
+                                }
+                                else
+                                {
+                                    Console.WriteLine(String.Format("[WARNING] Project Reference: {0}, project not found in: {1}", projectReferenceName, project.Path));
+                                }
+                        }
                     }
 
                     //Local libraries and GAC references
