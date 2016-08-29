@@ -2,6 +2,8 @@
 Dependencies Viewer for .Net Projects and Solutions.
 Generate a graph with the dependencies between solutions, projects, nuget packages, local bookstores and libraries GAC
 
+Thanks to Pascal Laurin for the idea and the base code: http://pascallaurin42.blogspot.com.es/2014/06/visualizing-nuget-packages-dependencies.html
+
 ## Usage:
 DotNetProjectsDependenciesViewer.ConsoleUI.exe [OPTIONS]
 
