@@ -15,10 +15,13 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
         {
             string rootFolder = string.Empty;
             bool showHelp = false;
+            List<string> nugetPackagesToFilter = new List<string>();
 
             var optionSet = new OptionSet() {
                 { "p|path=", "the root path of the solutions to search dependencies",
                   p => rootFolder = p},
+                {"nuget=", "nuget packages to show only its dependencies. You can use as many times as you want this parameter.",
+                    n => nugetPackagesToFilter.Add(n) },
                 { "h|help",  "show this message and exit",
                   v => showHelp = v != null }
             };
@@ -51,7 +54,7 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
                 return;
             }
 
-            DependencyGenerator gen = new DependencyGenerator(rootFolder);
+            DependencyGenerator gen = new DependencyGenerator(rootFolder, nugetPackagesToFilter);
 
             Console.WriteLine(String.Empty);
             Console.WriteLine(String.Format("Go to {0} and open Dependencies.dgml with Visual Studio.", rootFolder));

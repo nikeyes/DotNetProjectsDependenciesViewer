@@ -13,7 +13,7 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
         private List<Package> _allPackages = new List<Package>();
         private List<Library> _allLibraries = new List<Library>();
 
-        public DependencyGenerator(string rootFolder)
+        public DependencyGenerator(string rootFolder, List<String> nugetPackagesToFilter)
         {
             string[] projectExtensionExclusions = new[] { ".vdproj", ".ndproj", ".wdproj", ".shfbproj", ".sqlproj" };
 
@@ -27,6 +27,28 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
 
             string path = Path.Combine(rootFolder, "Dependencies.dgml");
             DGMLPackageDependencies packageDependencies = new DGMLPackageDependencies();
+
+            if (nugetPackagesToFilter.Any())
+            {
+                nugetPackagesToFilter = nugetPackagesToFilter.ConvertAll(n => n.ToLower());
+
+                _allSolutions = _allSolutions.Where(sln => 
+                    sln.Projects.Any(p => 
+                    p.Packages.Any(pkg => 
+                    nugetPackagesToFilter.Contains(pkg.Name.ToLower()) 
+                        || nugetPackagesToFilter.Contains(pkg.NameWithVersion.ToLower())))).ToList();
+
+                _allProjects = _allProjects.Where(p 
+                    => p.Packages.Any(pkg 
+                    => nugetPackagesToFilter.Contains(pkg.Name.ToLower()) 
+                        || nugetPackagesToFilter.Contains(pkg.NameWithVersion.ToLower()))).ToList();
+
+                _allPackages = _allPackages.Where(
+                    pkg => nugetPackagesToFilter.Contains(pkg.Name.ToLower()) 
+                        || nugetPackagesToFilter.Contains(pkg.NameWithVersion.ToLower())).ToList();
+
+                _allLibraries.Clear();
+            }
 
             packageDependencies.generateDGML(path, _allSolutions, _allProjects, _allPackages, _allLibraries);
         }
@@ -116,53 +138,61 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
                     XDocument projectDoc = XDocument.Load(project.PathAndName);
                     IEnumerable<XElement> projectReferences = projectDoc.Descendants(ns + "ProjectReference");
 
-                    //References between projects of the same solution
-                    foreach (var projectReference in projectReferences)
-                    {
-                        string projectReferenceName = projectReference.Element(ns + "Name").Value;
-                
-                        IEnumerable<Project> referencesProjects = solution.Projects.Where(p => p.Name == projectReferenceName);
+                    ReferencesBetweenProjectsOfTheSameSolution(ns, solution, project, projectReferences);
 
-                        if (referencesProjects.Count() > 1)
-                        {
-                            Console.WriteLine(String.Format("[ERROR] Project Reference: {0}. Maybe you may have projects (.csproj) in folder {1}  that are not in solution file {2}", projectReferenceName, solution.Path, solution.PathAndName));
-                            foreach (Project p in referencesProjects)
-                            {
-                                Console.WriteLine(String.Format(p.PathAndName));
-                            }
-                        }
-                        else
-                        { 
-                                if (referencesProjects.Any())
-                                {
-                                    Project prj = referencesProjects.First();
-                                    project.Projects.Add(prj);
-                                }
-                                else
-                                {
-                                    Console.WriteLine(String.Format("[WARNING] Project Reference: {0}, project not found in: {1}", projectReferenceName, project.Path));
-                                }
-                        }
+                    LocalLibrariesAndGACReferences(ns, project, projectDoc);
+                }
+            }
+        }
+
+        private static void ReferencesBetweenProjectsOfTheSameSolution(XNamespace ns, Solution solution, Project project, IEnumerable<XElement> projectReferences)
+        {
+            foreach (var projectReference in projectReferences)
+            {
+                string projectReferenceName = projectReference.Element(ns + "Name").Value;
+
+                IEnumerable<Project> referencesProjects = solution.Projects.Where(p => p.Name == projectReferenceName);
+
+                if (referencesProjects.Count() > 1)
+                {
+                    Console.WriteLine(String.Format("[ERROR] Project Reference: {0}. Maybe you may have projects (.csproj) in folder {1}  that are not in solution file {2}", projectReferenceName, solution.Path, solution.PathAndName));
+                    foreach (Project p in referencesProjects)
+                    {
+                        Console.WriteLine(String.Format(p.PathAndName));
                     }
-
-                    //Local libraries and GAC references
-                    IEnumerable<XElement> references = projectDoc.Descendants(ns + "Reference").Where(r => !r.Value.Contains(@"\packages\"));
-                    foreach (XElement reference in references)
+                }
+                else
+                {
+                    if (referencesProjects.Any())
                     {
-                        string name = reference.Attribute("Include").Value;
-                        bool isGAC = !reference.Elements(ns + "HintPath").Any();
-
-                        var library = _allLibraries.SingleOrDefault(l => l.Name == name);
-
-                        if (library == null)
-                        {
-                            library = new Library { Name = name, IsGAC = isGAC };
-                            project.Libraries.Add(library);
-                            _allLibraries.Add(library);
-                        }
+                        Project prj = referencesProjects.First();
+                        project.Projects.Add(prj);
+                    }
+                    else
+                    {
+                        Console.WriteLine(String.Format("[WARNING] Project Reference: {0}, project not found in: {1}", projectReferenceName, project.Path));
                     }
                 }
             }
-        }  
+        }
+
+        private void LocalLibrariesAndGACReferences(XNamespace ns, Project project, XDocument projectDoc)
+        {
+            IEnumerable<XElement> references = projectDoc.Descendants(ns + "Reference").Where(r => !r.Value.Contains(@"\packages\"));
+            foreach (XElement reference in references)
+            {
+                string name = reference.Attribute("Include").Value;
+                bool isGAC = !reference.Elements(ns + "HintPath").Any();
+
+                var library = _allLibraries.SingleOrDefault(l => l.Name == name);
+
+                if (library == null)
+                {
+                    library = new Library { Name = name, IsGAC = isGAC };
+                    project.Libraries.Add(library);
+                    _allLibraries.Add(library);
+                }
+            }
+        }
     }
 }

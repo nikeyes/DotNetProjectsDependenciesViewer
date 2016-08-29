@@ -14,6 +14,14 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
             }
         }
 
+        public string NameWithVersion
+        {
+            get
+            {
+                return Name + "-" + Version;
+            }
+        }
+
         public Package(string name, string version)
         {
             Name = name;
