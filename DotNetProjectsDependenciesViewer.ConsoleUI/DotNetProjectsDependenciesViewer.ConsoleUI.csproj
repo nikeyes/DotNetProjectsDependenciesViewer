@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DGMLPackageDependencies.cs" />
     <Compile Include="DGML\Condition.cs" />
     <Compile Include="DGML\DGMLWriter.cs" />
     <Compile Include="DependencyGenerator.cs" />
