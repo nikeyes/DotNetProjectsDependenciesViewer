@@ -16,7 +16,7 @@ Samples:
 
 DotNetProjectsDependenciesViewer.ConsoleUI.exe **--help**
 
-DotNetProjectsDependenciesViewer.ConsoleUI.exe **-p=d: -n=newtonsoft.json -n=Microsoft.AspNet.Razor-3.2-3 -n=Microsoft.AspNet.MVC**
+DotNetProjectsDependenciesViewer.ConsoleUI.exe **--path=d: -n=newtonsoft.json -n=Microsoft.AspNet.Razor-3.2-3 -n=Microsoft.AspNet.MVC**
 
 ## Result:
 Generate a Dependencies.dgml in Path base .Net Projects. 
