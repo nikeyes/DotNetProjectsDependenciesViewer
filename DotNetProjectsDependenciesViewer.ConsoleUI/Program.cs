@@ -18,10 +18,10 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
             List<string> nugetPackagesToFilter = new List<string>();
 
             var optionSet = new OptionSet() {
-                { "p|path=", "the root path of the solutions to search dependencies",
+                { "p|path=", "REQUIRED - the root path of the solutions to search dependencies. Sample: -p=d:",
                   p => rootFolder = p},
-                {"nuget=", "nuget packages to show only its dependencies. You can use as many times as you want this parameter.",
-                    n => nugetPackagesToFilter.Add(n) },
+                { "n|nuget=", "nuget packages to show only its dependencies. You can use as many times as you want this parameter. Sample: -n=newtonsoft.json -n=Microsoft.AspNet.Razor-3.2-3",
+                  n => nugetPackagesToFilter.Add(n)},
                 { "h|help",  "show this message and exit",
                   v => showHelp = v != null }
             };
@@ -30,6 +30,13 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
             try
             {
                 parameters = optionSet.Parse(args);
+
+                if (showHelp)
+                {
+                    ShowHelp(optionSet);
+                    return;
+                }
+
                 if (String.IsNullOrWhiteSpace(rootFolder))
                 {
                     throw new OptionException("Missing required option -p=path", "p|path=");
@@ -45,12 +52,6 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
                 Console.Write("DotNetProjectsDependenciesViewer: ");
                 Console.WriteLine(e.Message);
                 Console.WriteLine("Try `DotNetProjectsDependenciesViewer --help' for more information.");
-                return;
-            }
-
-            if (showHelp)
-            {
-                ShowHelp(optionSet);
                 return;
             }
 
