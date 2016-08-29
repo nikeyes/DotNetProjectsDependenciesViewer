@@ -60,8 +60,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DGMLWriter.cs" />
+    <Compile Include="DGML\Condition.cs" />
+    <Compile Include="DGML\DGMLWriter.cs" />
     <Compile Include="DependencyGenerator.cs" />
+    <Compile Include="DGML\Graph.cs" />
+    <Compile Include="DGML\Link.cs" />
+    <Compile Include="DGML\Node.cs" />
+    <Compile Include="DGML\Setter.cs" />
+    <Compile Include="DGML\Style.cs" />
     <Compile Include="Library.cs" />
     <Compile Include="Package.cs" />
     <Compile Include="Program.cs" />

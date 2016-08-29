@@ -1,9 +1,8 @@
-﻿using System;
+﻿using DotNetProjectsDependenciesViewer.ConsoleUI.DGML;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace DotNetProjectsDependenciesViewer.ConsoleUI
@@ -158,44 +157,13 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
             AddStyleToGraph(dgml);
 
             dgml.Serialize(filename);
-            /*
-            var graph = new XElement(dgmlns + "DirectedGraph", new XAttribute("GraphDirection", "LeftToRight"),
-                new XElement(dgmlns + "Nodes",
-                    this.projects.Select(p => CreateNode(p.Name, "Project")),
-                    this.libraries.Select(l => CreateNode(l.Name, l.IsGAC ? "GAC Library" : "Library", l.Name.Split(',')[0])),
-                    this.packages.Select(p => CreateNode(p.Name + " " + p.Version, "Package")),
-                    CreateNode("AllProjects", "Project", label: "All Projects", @group: "Expanded"),
-                    CreateNode("AllPackages", "Package", label: "All Packages", @group: "Expanded"),
-                    CreateNode("LocalLibraries", "Library", label: "Local Libraries", @group: "Expanded"),
-                    CreateNode("GlobalAssemblyCache", "GAC Library", label: "Global Assembly Cache", @group: "Collapsed")),
-                new XElement(dgmlns + "Links",
-                    this.projects.SelectMany(p => p.Projects.Select(pr => new { Source = p, Target = pr }))
-                        .Select(l => CreateLink(l.Source.Name, l.Target.Name, "Project Reference")),
-                    this.projects.SelectMany(p => p.Libraries.Select(l => new { Source = p, Target = l }))
-                        .Select(l => CreateLink(l.Source.Name, l.Target.Name, "Library Reference")),
-                    this.projects.SelectMany(p => p.Packages.Select(pa => new { Source = p, Target = pa }))
-                        .Select(l => CreateLink(l.Source.Name, l.Target.Name + " " + l.Target.Version, "Installed Package")),
-                    this.projects.Select(p => CreateLink("AllProjects", p.Name, "Contains")),
-                    this.packages.Select(p => CreateLink("AllPackages", p.Name + " " + p.Version, "Contains")),
-                    this.libraries.Where(l => !l.IsGAC).Select(l => CreateLink("LocalLibraries", l.Name, "Contains")),
-                    this.libraries.Where(l => l.IsGAC).Select(l => CreateLink("GlobalAssemblyCache", l.Name, "Contains"))),
-                // No need to declare Categories, auto generated
-                new XElement(dgmlns + "Styles",
-                    CreateStyle("Project", "Blue"),
-                    CreateStyle("Package", "Purple"),
-                    CreateStyle("Library", "Green"),
-                    CreateStyle("GAC Library", "LightGreen")));
-            */
-
-            //var doc = new XDocument(graph);
-            //doc.Save(filename);
         }
 
         private void AddPackagesNodes(DGMLWriter dgml)
         {
             foreach (Package package in _allPackages)
             {
-                dgml.AddNode(new DGMLWriter.Node(package.Id, null, null, "Package"));
+                dgml.AddNode(package.Id, null, null, "Package");
             }
 
             AddGroupsForDiferentsVersionOfPackages(dgml);
@@ -205,26 +173,26 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
         {
             foreach (Project project in _allProjects)
             {
-                dgml.AddNode(new DGMLWriter.Node(project.Name, null, null, "Project"));
+                dgml.AddNode(project.Name, null, null, "Project");
             }
         }
 
         private void AddLibrariesNodes(DGMLWriter dgml)
         {
-            dgml.AddNode(new DGMLWriter.Node("GlobalAssemblyCache", "Global Assembly Cache", "Collapsed", "GAC Library"));
-            dgml.AddNode(new DGMLWriter.Node("LocalLibraries", "Local Libraries", "Expanded", "Libraries"));
+            dgml.AddNode("GlobalAssemblyCache", "Global Assembly Cache", "Collapsed", "GAC Library");
+            dgml.AddNode("LocalLibraries", "Local Libraries", "Expanded", "Libraries");
 
             foreach (Library library in _allLibraries)
             {
                 if (library.IsGAC)
                 {
-                    dgml.AddNode(new DGMLWriter.Node(library.Name, null, null, "GAC Library"));
-                    dgml.AddLink(new DGMLWriter.Link("GlobalAssemblyCache", library.Name, null, "Contains"));
+                    dgml.AddNode(library.Name, null, null, "GAC Library");
+                    dgml.AddLink("GlobalAssemblyCache", library.Name, null, "Contains");
                 }
                 else
                 {
-                    dgml.AddNode(new DGMLWriter.Node(library.Name, null, null, "Library"));
-                    dgml.AddLink(new DGMLWriter.Link("LocalLibraries", library.Name, null, "Contains"));
+                    dgml.AddNode(library.Name, null, null, "Library");
+                    dgml.AddLink("LocalLibraries", library.Name, null, "Contains");
                 }
             }
         }
@@ -238,11 +206,11 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
 
             foreach (List<Package> packageGrouped in groupedPackages)
             {
-                dgml.AddNode(new DGMLWriter.Node(packageGrouped[0].Name, packageGrouped[0].Name, "Expanded", "PackageGroup"));
+                dgml.AddNode(packageGrouped[0].Name, packageGrouped[0].Name, "Expanded", "PackageGroup");
 
                 foreach (Package package in packageGrouped)
                 {
-                    dgml.AddLink(new DGMLWriter.Link(package.Name, package.Id, null, "Contains"));
+                    dgml.AddLink(package.Name, package.Id, null, "Contains");
                 }
                 //dgml.AddLink(new DGMLWriter.Link(project.Name, package.Name + " " + package.Version, null, "Installed Package"));
             }
@@ -252,25 +220,25 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
         {
             foreach (Solution solution in _allSolutions)
             {
-                dgml.AddNode(new DGMLWriter.Node(solution.Name, solution.Name, "Expanded", "Solution"));
+                dgml.AddNode(solution.Name, solution.Name, "Expanded", "Solution");
 
                 foreach (Project project in solution.Projects)
                 {
-                    dgml.AddLink(new DGMLWriter.Link(solution.Name, project.Name, null, "Contains"));
+                    dgml.AddLink(solution.Name, project.Name, null, "Contains");
 
                     foreach (Project projectChild in project.Projects)
                     {
-                        dgml.AddLink(new DGMLWriter.Link(project.Name, projectChild.Name, null, "Project Reference"));
+                        dgml.AddLink(project.Name, projectChild.Name, null, "Project Reference");
                     }
 
                     foreach (Package package in project.Packages)
                     {
-                        dgml.AddLink(new DGMLWriter.Link(project.Name, package.Id, null, "Installed Package"));
+                        dgml.AddLink(project.Name, package.Id, null, "Installed Package");
                     }
 
                     foreach (Library library in project.Libraries)
                     {
-                        dgml.AddLink(new DGMLWriter.Link(project.Name, library.Name, null, "Library Reference"));
+                        dgml.AddLink(project.Name, library.Name, null, "Library Reference");
                     }
                 }
             }
@@ -278,11 +246,11 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
 
         private static void AddStyleToGraph(DGMLWriter dgml)
         {
-            dgml.AddStyle(new DGMLWriter.Style("Project", "Blue"));
-            dgml.AddStyle(new DGMLWriter.Style("Package", "Purple"));
-            dgml.AddStyle(new DGMLWriter.Style("PackageGroup", "Plum"));
-            dgml.AddStyle(new DGMLWriter.Style("Library", "Green"));
-            dgml.AddStyle(new DGMLWriter.Style("GAC Library", "LightGreen"));
+            dgml.AddStyle("Project", "Blue");
+            dgml.AddStyle("Package", "Purple");
+            dgml.AddStyle("PackageGroup", "Plum");
+            dgml.AddStyle("Library", "Green");
+            dgml.AddStyle("GAC Library", "LightGreen");
         }
     }
 }
