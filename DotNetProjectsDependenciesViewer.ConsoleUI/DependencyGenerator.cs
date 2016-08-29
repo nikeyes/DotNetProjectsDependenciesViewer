@@ -16,7 +16,6 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
         public DependencyGenerator(string rootFolder)
         {
             string[] projectExtensionExclusions = new[] { ".vdproj", ".ndproj", ".wdproj", ".shfbproj", ".sqlproj" };
-            //string rootFolder = @"D:\desarrollo\git\repos";
 
             _allSolutions = new List<Solution>();
             _allProjects = new List<Project>();
