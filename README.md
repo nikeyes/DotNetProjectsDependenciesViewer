@@ -5,7 +5,8 @@ Generate a graph with the dependencies between solutions, projects, nuget packag
 ## Usage:
 DotNetProjectsDependenciesViewer.ConsoleUI.exe [OPTIONS]
 
-[OPTIONS]
+**[OPTIONS]**
+
 -p, --path=VALUE           REQUIRED - the root path of the solutions to search dependencies. Sample: -p=d:
 
 -n, --nuget=VALUE          nuget packages to show only its dependencies. You can use as many times as you want this parameter.
