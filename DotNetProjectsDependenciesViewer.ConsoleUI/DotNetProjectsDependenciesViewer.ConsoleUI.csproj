@@ -64,6 +64,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassicASP\ClassicASPFile.cs" />
+    <Compile Include="ClassicASP\DependencyGeneratorClassicASP.cs" />
+    <Compile Include="ClassicASP\DGMLPackageDependenciesClassicASP.cs" />
     <Compile Include="DGMLPackageDependencies.cs" />
     <Compile Include="DGML\Condition.cs" />
     <Compile Include="DGML\DGMLWriter.cs" />
