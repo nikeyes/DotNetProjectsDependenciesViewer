@@ -15,11 +15,15 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
         public List<Library> Libraries { get; private set; }
         public List<Package> Packages { get; private set; }
 
-        public Project()
+        public Project(String filePathAndName)
         {
             this.Projects = new List<Project>();
             this.Libraries = new List<Library>();
             this.Packages = new List<Package>();
+
+            PathAndName = filePathAndName;
+            Path = System.IO.Path.GetDirectoryName(filePathAndName);
+            Name = System.IO.Path.GetFileNameWithoutExtension(filePathAndName);
         }
     }
 

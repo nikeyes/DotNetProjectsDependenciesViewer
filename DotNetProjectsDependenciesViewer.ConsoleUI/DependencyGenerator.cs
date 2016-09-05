@@ -59,12 +59,7 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
 
             foreach (String sln in solitionsFile)
             {
-                Solution solution = new Solution
-                {
-                    PathAndName = sln,
-                    Name = Path.GetFileNameWithoutExtension(sln),
-                    Path = Path.GetDirectoryName(sln)
-                };
+                Solution solution = new Solution(sln);
 
                 LoadProjectsForSolution(solution, projectExtensionExclusions);
 
@@ -83,12 +78,7 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
 
                 if (project == null)
                 {
-                    project = new Project
-                    {
-                        PathAndName = projectFile,
-                        Path = Path.GetDirectoryName(projectFile),
-                        Name = Path.GetFileNameWithoutExtension(projectFile)
-                    };
+                    project = new Project(projectFile);
 
                     _allProjects.Add(project);
                 }
