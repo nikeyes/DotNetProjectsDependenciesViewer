@@ -13,9 +13,12 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI
         public string Path { get; set; }
         public List<Project> Projects { get; private set; }
 
-        public Solution()
+        public Solution(String filePathAndName)
         {
             this.Projects = new List<Project>();
+            PathAndName = filePathAndName;
+            Name = System.IO.Path.GetFileNameWithoutExtension(filePathAndName);
+            Path = System.IO.Path.GetDirectoryName(filePathAndName);
         }
     }
 }
