@@ -31,9 +31,9 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI.ClassicASP
             var matchResult = regex.Match(AllText);
             while (matchResult.Success)
             {
-                string pathInclude = System.IO.Path.Combine(basePath, matchResult.Groups[1].Value);
+                string pathInclude = System.IO.Path.Combine(basePath, matchResult.Groups[2].Value);
                 pathInclude = pathInclude.Replace("/", @"\");
-                pathInclude = System.IO.Path.GetFullPath(pathInclude);
+                //pathInclude = System.IO.Path.GetFullPath(pathInclude);
 
                 Includes.Add(pathInclude);
                 matchResult = matchResult.NextMatch();
