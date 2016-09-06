@@ -27,7 +27,7 @@ namespace DotNetProjectsDependenciesViewer.ConsoleUI.ClassicASP
 
         private void SearchIncludes(string basePath)
         {
-            var regex = new Regex("#include\\W+file=\"([^\"]+)\"");
+            var regex = new Regex("#include\\W+(file|virtual)=\"([^\"]+)\"", RegexOptions.IgnoreCase);
             var matchResult = regex.Match(AllText);
             while (matchResult.Success)
             {
